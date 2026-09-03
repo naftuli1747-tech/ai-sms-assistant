@@ -1,12 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const { GoogleGenAI } = require('@google/genai');
 const twilio = require('twilio');
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 
-const ai = new GoogleGenAI();
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 app.post('/sms', async (req, res) => {
     const incomingMessage = req.body.Body;
@@ -24,7 +24,7 @@ app.post('/sms', async (req, res) => {
 
         res.type('text/xml');
         res.send(twiml.toString());
-
+        
     } catch (error) {
         console.error("Error generating AI response:", error);
         const twiml = new twilio.twiml.MessagingResponse();
