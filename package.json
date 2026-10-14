@@ -1,14 +1,13 @@
 {
   "name": "ai-sms-assistant",
   "version": "1.0.0",
-  "description": "AI SMS Assistant",
+  "description": "SMS AI Assistant using Twilio and Gemini",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "@google/genai": "latest",
-    "body-parser": "^1.20.2",
+    "@google/genai": "^0.1.1",
     "express": "^4.19.2",
     "twilio": "^5.0.0"
   }
