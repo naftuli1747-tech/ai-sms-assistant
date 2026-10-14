@@ -11,19 +11,30 @@ app.post('/sms', async (req, res) => {
     const incomingMessage = req.body.Body;
     const twiml = new twilio.twiml.MessagingResponse();
 
+    let replyText = "";
     try {
+        // Try the primary model first
         const response = await ai.models.generateContent({
             model: 'gemini-3.8-flash',
             contents: incomingMessage,
         });
-
-        const replyText = response.text || "Sorry, I couldn't generate a response.";
-        twiml.message(replyText);
-    } catch (error) {
-        console.error("Error generating AI response:", error);
-        twiml.message("Sorry, an error occurred while processing your request.");
+        replyText = response.text;
+    } catch (primaryError) {
+        console.warn("Primary model busy, trying fallback model...", primaryError);
+        try {
+            // Fallback model
+            const fallbackResponse = await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: incomingMessage,
+            });
+            replyText = fallbackResponse.text;
+        } catch (fallbackError) {
+            console.error("Error generating AI response from both models:", fallbackError);
+            replyText = "Sorry, my AI models are currently experiencing high demand. Please try again in a moment!";
+        }
     }
 
+    twiml.message(replyText || "Sorry, I couldn't generate a response.");
     res.type('text/xml');
     res.send(twiml.toString());
 });
